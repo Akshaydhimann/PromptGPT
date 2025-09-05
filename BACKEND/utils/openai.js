@@ -25,4 +25,4 @@ const getOpenAIAPIResponse = async(message) => {
     }
 }
 
-export default getOpenAIAPIResponse
+export default getOpenAIAPIResponse;
