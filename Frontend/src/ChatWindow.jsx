@@ -1,13 +1,16 @@
 import "./ChatWindow.css";
 import Chat from "./Chat.jsx";
 import { MyContext } from "./MyContext.jsx";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+import {ScaleLoader} from "react-spinners";
 
 function ChatWindow()
 {
-    const {prompt, setPrompt, reply, setReply, currThreadId} = useContext(MyContext);
+    const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats} = useContext(MyContext);
+    const [loading, setLoading] = useState(false);
 
     const getReply = async () => {
+        setLoading(true);
         console.log("message", prompt, "threadId", currThreadId);
         const options = {
             method: "POST",
@@ -23,15 +26,29 @@ function ChatWindow()
 
             try{
                 const response = await fetch("http://localhost:8080/api/chat", options);
-                console.log(response);
-            //     // ....................................
-            //     console.log(data);
-            //     setReply(data.reply);
-            //    //......................................
+                const res = await response.json();
+                console.log(res);
+                setReply(res.reply);
             } catch(err) {
                 console.log(err);
             }
+            setLoading(false);
         };
+
+        useEffect(() => {
+            if(prompt && reply) {
+                setPrevChats(prevChats => (
+                    [...prevChats, {
+                        role: "user",
+                        content: prompt
+                    },{
+                        role: "assistant",
+                        content: reply
+                    }]
+                ));
+            }
+            setPrompt("");
+        }, [reply]);
 
 
     return (
@@ -44,12 +61,18 @@ function ChatWindow()
             </div>
             
             <Chat></Chat>
+
+            <ScaleLoader color="#fff" loading={loading}>
+
+            </ScaleLoader>
+
             
             <div className="chatInput">
                 <div className="inputBox">
                     <input placeholder="Ask anything"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter'? getReply() : ''}
                     >
                     
                     </input>
