@@ -49,6 +49,16 @@ mongoose.connect("mongodb://127.0.0.1:27017/promptgpt", {
 .then(() => console.log("✅ MongoDB connected"))
 .catch(err => console.error("MongoDB connection error:", err));
 
+//+++++++++++++++++++++++++++
+app.get("/api/thread", (req, res) => {
+    res.json([
+        { id: 1, name: "Thread 1" },
+        { id: 2, name: "Thread 2" },
+        { id: 3, name: "Thread 3" },
+    ]);
+});
+//+++++++++++++++++++++++++++
+
 app.listen(8080, () => {
     console.log("✅ Server running on http://localhost:8080");
 });
